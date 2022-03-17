@@ -7,14 +7,14 @@ Its command line argument mechanism is very basic. It is very close to the &de A
 ./de <input_eqn_file> <output_eqn_file> <target> <depth> <graph> <verbose>
 ```
 where:
-- <input_eqn_file> : is the input eqn file name
-- <output_end_file> : is the output eqn file name
-- <target> : is an integer with convention:
-  - 0 : target is area. Try to minimize #Luts
-  - 1 : target is delay. Try to minimize Max Level of Lut logic with possibly minimum #Luts
-  - 2 : target is mixed. Try to get best compromise between #Luts and Max Level of Lut logic. It is for now : #Luts * MaxLvl
-- <depth>: depth of the exploration tree. It can be between 0 (do nothing, just simple map) to any number close to 100. 100 will be for very small designs like less than 500 Luts. For bigger designs it can be between 3 (> 20KLuts deisgns) and 20 (> 2K luts designs). -1 means that the depth will be defined dynamically along the exploration process. It is advised to use this -1 value for simple usage and specific value for deep analysis.
-- <graph> : non 0 value tells DE to pop up a graphical representation of the exploration tree. The best path leading to the best solution will be bold. You will be able to see the pruned and maxThreadLimited calls. To make this option work correctly you need to have “dot” and “okular” installed.
+- `<input_eqn_file>` : is the input eqn file name
+- `<output_end_file>` : is the output eqn file name
+- `<target>` : is an integer with convention:
+  - `0` : target is area. Try to minimize #Luts
+  - `1` : target is delay. Try to minimize Max Level of Lut logic with possibly minimum #Luts
+  - `2` : target is mixed. Try to get best compromise between #Luts and Max Level of Lut logic. It is for now : #Luts * MaxLvl
+- `<depth>` : depth of the exploration tree. It can be between 0 (do nothing, just simple map) to any number close to 100. 100 will be for very small designs like less than 500 Luts. For bigger designs it can be between 3 (> 20KLuts deisgns) and 20 (> 2K luts designs). -1 means that the depth will be defined dynamically along the exploration process. It is advised to use this -1 value for simple usage and specific value for deep analysis.
+- `<graph>` : non 0 value tells DE to pop up a graphical representation of the exploration tree. The best path leading to the best solution will be bold. You will be able to see the pruned and maxThreadLimited calls. To make this option work correctly you need to have “dot” and “okular” installed.
 - <verbose> : non 0 value tells DE to show the exploration statistics along the process.
 
 # The “&de” ABC command
@@ -23,17 +23,17 @@ DE is called from ABC through a new ABC9 command of name ‘&de’. This command
 &de -i <input_eqn_file> -o <output_eqn_file> -t <target> -d <depth> -g -v
 ```
 where
-- -i <input_eqn_file> : name of the EQN file describing the input Boolean equations to optimize and map.
-- -o <output_eqn_file> : name of the EQN file describing the optimized and mapped Boolean network (mapping up to K inputs, e.g. 6 here)
-- -t <target> : either “area” or “delay” or “mixed”, targeting either an area solution minimizing #Luts, or a delay solution minimizing the max Lut path level or a mixed solution being a good trade off between area and delay (product of #Luts and Max Lut Path level).
-- -d <depth> : an integer value between -1 and +infinity. It represents the max exploration depth so it should corresponds to a reasonable value not exceeding 10, 50, 100 depending on the size of the design. Generally can be 100 for a small designs (~500 Luts), 3 for a very big one (> 20K Luts), 11 to 21 in general. There is an automatic mode with value -1 that will dynamically along the exploration process set the best value. Therefore it is recommended to set depth to -1.
-- -g : if invoked then a DOT graph will pop up to show the exploration process with all the statistics, pruning, max limited, failures. This is only for analysis. We do not use it in normal mode.
-- -v: if invoked then trace all informations related to the threads exploration. Generally most used for analysis. We do not use it in normal mode.
+- `-i <input_eqn_file>` : name of the EQN file describing the input Boolean equations to optimize and map.
+- `-o <output_eqn_file>` : name of the EQN file describing the optimized and mapped Boolean network (mapping up to K inputs, e.g. 6 here)
+- `-t <target>` : either “area” or “delay” or “mixed”, targeting either an area solution minimizing #Luts, or a delay solution minimizing the max Lut path level or a mixed solution being a good trade off between area and delay (product of #Luts and Max Lut Path level).
+- `-d <depth>` : an integer value between -1 and +infinity. It represents the max exploration depth so it should corresponds to a reasonable value not exceeding 10, 50, 100 depending on the size of the design. Generally can be 100 for a small designs (~500 Luts), 3 for a very big one (> 20K Luts), 11 to 21 in general. There is an automatic mode with value -1 that will dynamically along the exploration process set the best value. Therefore it is recommended to set depth to -1.
+- `-g` : if invoked then a DOT graph will pop up to show the exploration process with all the statistics, pruning, max limited, failures. This is only for analysis. We do not use it in normal mode.
+- `-v` : if invoked then trace all informations related to the threads exploration. Generally most used for analysis. We do not use it in normal mode.
 
 # How to run
 First of all to run DE from Yosys we need to set up two environment variable:
-- “ABC” : the ABC executablepath that “DE” will call
-- “DE” : the executable path to DE
+- `ABC` : the ABC executablepath that “DE” will call
+- `DE` : the executable path to DE
 In the ABC script called by Yosys we can for instance write:
 ```bash
 &de -i input.eqn -o netlist.eqn -t area -d -1 -v
