@@ -15,7 +15,7 @@ where:
   - `2` : target is mixed. Try to get best compromise between #Luts and Max Level of Lut logic. It is for now : #Luts * MaxLvl
 - `<depth>` : depth of the exploration tree. It can be between 0 (do nothing, just simple map) to any number close to 100. 100 will be for very small designs like less than 500 Luts. For bigger designs it can be between 3 (> 20KLuts deisgns) and 20 (> 2K luts designs). -1 means that the depth will be defined dynamically along the exploration process. It is advised to use this -1 value for simple usage and specific value for deep analysis.
 - `<graph>` : non 0 value tells DE to pop up a graphical representation of the exploration tree. The best path leading to the best solution will be bold. You will be able to see the pruned and maxThreadLimited calls. To make this option work correctly you need to have “dot” and “okular” installed.
-- <verbose> : non 0 value tells DE to show the exploration statistics along the process.
+- `<verbose>` : non 0 value tells DE to show the exploration statistics along the process.
 
 # The “&de” ABC command
 DE is called from ABC through a new ABC9 command of name ‘&de’. This command will take the following arguments:
@@ -34,6 +34,7 @@ where
 First of all to run DE from Yosys we need to set up two environment variable:
 - `ABC` : the ABC executablepath that “DE” will call
 - `DE` : the executable path to DE
+
 In the ABC script called by Yosys we can for instance write:
 ```bash
 &de -i input.eqn -o netlist.eqn -t area -d -1 -v
