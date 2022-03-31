@@ -27,3 +27,11 @@ if(BUILD_LSORACLE)
 endif()
 add_subdirectory(abc-rs)
 add_subdirectory(de)
+
+# Installation target
+install(
+    DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
+    DESTINATION logic_synthesis)
+install(
+    DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    DESTINATION logic_synthesis)
