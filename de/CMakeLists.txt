@@ -18,4 +18,4 @@ list(APPEND DE_CXX_FLAGS_RELEASE
 )
 target_compile_options(de PUBLIC $<$<CONFIG:DEBUG>:${DE_CXX_FLAGS_DEBUG}>)
 target_compile_options(de PUBLIC $<$<CONFIG:RELEASE>:${DE_CXX_FLAGS_RELEASE}>)
-target_link_options(de PUBLIC -lpthread)
+target_link_libraries(de PRIVATE pthread)
