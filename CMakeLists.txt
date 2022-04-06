@@ -31,7 +31,13 @@ add_subdirectory(de)
 # Installation target
 install(
     DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
-    DESTINATION logic_synthesis)
+    DESTINATION logic_synthesis
+    PATTERN "*"
+    PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+                GROUP_EXECUTE GROUP_READ)
 install(
     DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    DESTINATION logic_synthesis)
+    DESTINATION logic_synthesis
+    PATTERN "*"
+    PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+                GROUP_EXECUTE GROUP_READ)
