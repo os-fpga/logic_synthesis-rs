@@ -28,6 +28,21 @@ endif()
 add_subdirectory(abc-rs)
 add_subdirectory(de)
 
+# Add extra compilation flags to suppress warnings from some abc-rs
+# Note that target_compile_options() *appends* to the current compilation options of
+# the specified target
+
+#Since ABC is an externally developed tool, we suppress all compiler warnings
+CHECK_CXX_COMPILER_FLAG("-w" CXX_COMPILER_SUPPORTS_-w)
+if(CXX_COMPILER_SUPPORTS_-w)
+    target_compile_options(libabc PRIVATE "-w")
+    target_compile_options(abc PRIVATE "-w")
+endif()
+
+#Some ABC headers generate warnings, treat them as system headers to suppress warnings
+get_property(ABC_INCLUDE_DIRS TARGET libabc PROPERTY INCLUDE_DIRECTORIES)
+target_include_directories(libabc SYSTEM INTERFACE ${ABC_INCLUDE_DIRS})
+
 # Installation target
 install(
     PROGRAMS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/abc
