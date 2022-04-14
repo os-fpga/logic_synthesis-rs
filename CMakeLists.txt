@@ -18,6 +18,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
+set(ABC ${CMAKE_CURRENT_BINARY_DIR}/bin/abc)
+set(DE ${CMAKE_CURRENT_BINARY_DIR}/bin/de)
+set(LSORACLE ${CMAKE_CURRENT_BINARY_DIR}/bin/lsoracle)
+
 option(BUILD_LSORACLE "Enable build of LSOracle" OFF)
 if(BUILD_LSORACLE)
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/LSOracle-rs/lib/boost/cmake)
@@ -51,3 +55,12 @@ install(
 install(
     FILES ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/libabc.a
     DESTINATION lib/abc)
+
+enable_testing()
+add_test(
+    NAME logic_synthesis-rs-smoke-test
+    COMMAND ${ABC} -f ../tests/abc.scr
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/abc-rs
+    )
+set_property(TEST logic_synthesis-rs-smoke-test
+    PROPERTY ENVIRONMENT ABC=${ABC} DE=${DE} LSORACLE=${LSORACLE})

@@ -1,0 +1,5 @@
+read i10.aig;
+short_names;
+write_eqn input.eqn;
+&de -i input.eqn -o output.eqn -t area -d 3;
+cec input.eqn output.eqn;
