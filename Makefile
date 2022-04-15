@@ -61,7 +61,6 @@ endif
 install: release
 	cmake --install build
 
-# exports should not be used when https://github.com/RapidSilicon/yosys_verific_rs/issues/168 is fixed
 ##
 ## @ test_install
 ##     |---> info       :  Test if everything is installed properly
