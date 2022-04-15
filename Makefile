@@ -35,6 +35,13 @@ run-cmake-debug:
 	cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DCMAKE_RULE_MESSAGES=$(RULE_MESSAGES) $(ADDITIONAL_CMAKE_OPTIONS) -S . -B dbuild
 
 ##
+## @ test
+##     |---> info       :  Run tests
+##     |---> usage      :  make test
+test: release
+	cmake --build build --target test
+
+##
 ## @ clean
 ##     |---> info       :  Clean all
 ##     |---> usage      :  make clean
@@ -53,6 +60,22 @@ endif
 ##     |---> usage      :  make install
 install: release
 	cmake --install build
+
+##
+## @ test_install
+##     |---> info       :  Test if everything is installed properly
+##     |---> usage      :  make test_install
+test_install:
+	cd abc-rs && $(PREFIX)/bin/abc -f ../tests/abc.scr
+
+##
+## @ uninstall
+##     |---> info       :  Uninstall binaries and libraries
+##     |---> usage      :  make uninstall
+uninstall:
+	$(RM) -r $(PREFIX)/bin/abc
+	$(RM) -r $(PREFIX)/bin/de
+	$(RM) -r $(PREFIX)/lib/abc
 
 help: Makefile
 	@echo '   #############################################'
