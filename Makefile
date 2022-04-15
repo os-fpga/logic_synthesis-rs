@@ -14,10 +14,6 @@ ADDITIONAL_CMAKE_OPTIONS ?=
 PREFIX ?= /usr/local
 RULE_MESSAGES ?= off
 
-ABC=$(PREFIX)/bin/abc
-DE=$(PREFIX)/bin/de
-LSORACLE=$(PREFIX)/bin/lsoracle
-
 ##
 ## @ release
 ##     |---> info       :  Release build
@@ -44,7 +40,6 @@ run-cmake-debug:
 ##     |---> usage      :  make test
 test: release
 	cmake --build build --target test
-	#source tests/export_env.sh && $(ABC) -f tests/abc.scr
 
 ##
 ## @ clean
@@ -72,10 +67,7 @@ install: release
 ##     |---> info       :  Test if everything is installed properly
 ##     |---> usage      :  make test_install
 test_install:
-	export ABC=$(ABC) &&\
-	export DE=$(DE) &&\
-	export LSORACLE=$(LSORACLE) &&\
-	cd abc-rs && $(ABC) -f ../tests/abc.scr
+	cd abc-rs && $(PREFIX)/bin/abc -f ../tests/abc.scr
 
 ##
 ## @ uninstall
