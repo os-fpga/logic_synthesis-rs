@@ -1,0 +1,297 @@
+name: logic_synthesis-rs CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  linux-gcc:
+    name: ${{ matrix.mode }}
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        mode:
+        - test
+        - install
+#        - valgrind
+    env:
+      MODE: ${{ matrix.mode }}
+
+    steps:
+
+    - name: Cancel previous
+      uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        access_token: ${{ github.token }}
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: ssh-agent
+      uses: webfactory/ssh-agent@v0.5.4
+      with: 
+        ssh-private-key: |
+          ${{ secrets.SSH_PRIVATE_KEY_ABC }}
+          ${{ secrets.SSH_PRIVATE_KEY_LSORACLE }}
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Install dependencies
+      working-directory: ./.github/scripts
+      run: |
+        bash install_ubuntu_dependencies_build.sh
+
+    - name: Use ccache
+      uses: hendrikmuhs/ccache-action@v1
+      with:
+        key: linux-${{ matrix.mode }}
+
+    - name: Configure shell
+      run: |
+        echo 'CC=gcc-9' >> $GITHUB_ENV
+        echo 'CXX=g++-9' >> $GITHUB_ENV
+        echo 'PATH=/usr/lib/ccache:'"$PATH" >> $GITHUB_ENV
+        echo 'PREFIX=/tmp/logic_synthesis-install' >> $GITHUB_ENV
+        echo "ADDITIONAL_CMAKE_OPTIONS='-DMY_CXX_WARNING_FLAGS="-W -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Werror -UNDEBUG"'" >> $GITHUB_ENV
+        echo 'RULE_MESSAGES=off' >> $GITHUB_ENV
+
+    - name: Show shell configuration
+      run: |
+        env
+        which cmake && cmake --version
+        which make && make --version
+        which python && python --version
+        which ninja && ninja --version
+        which $CC && $CC --version
+        which $CXX && $CXX --version
+
+    - name: Test
+      if: matrix.mode == 'test'
+      run: |
+        make release
+        make test
+        make debug
+        make dtest
+
+    - name: Valgrind
+      if: matrix.mode == 'valgrind'
+      run: |
+        make debug
+        make test/valgrind
+
+    - name: Install Test
+      if: matrix.mode == 'install'
+      run: |
+        make release
+        make install
+        make clean   # make sure we only see installation artifacts
+        make test_install
+
+  centos7-gcc:
+    name: centos7-gcc
+    runs-on: ubuntu-latest
+    container:
+      image: centos:7
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+
+    - name: Cancel previous
+      uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        access_token: ${{ github.token }}
+        
+    - name: Install ssh-agent
+      run: |
+        yum install -y openssh-server openssh-clients
+        yum-config-manager --enable rhel-server-rhscl-7-rpms
+        yum install -y https://repo.ius.io/ius-release-el7.rpm
+        yum install -y centos-release-scl
+        yum install -y devtoolset-9
+        yum install -y devtoolset-9-toolchain
+        yum install -y git222
+
+    - name: ssh-agent
+      uses: webfactory/ssh-agent@v0.5.4
+      with: 
+        ssh-private-key: |
+          ${{ secrets.SSH_PRIVATE_KEY_ABC }}
+          ${{ secrets.SSH_PRIVATE_KEY_LSORACLE }}
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        fetch-depth: 0
+        
+    - name: Install dependencies
+      working-directory: ./.github/scripts
+      run: |
+        bash install_centos_dependencies_build.sh
+
+    - name: Show shell configuration
+      run: |
+        env
+        source /opt/rh/devtoolset-9/enable
+        which gcc 
+        which g++ 
+
+    - name: Configure shell
+      run: |
+        source /opt/rh/devtoolset-9/enable
+        echo 'CC=/opt/rh/devtoolset-9/root/usr/bin/gcc' >> $GITHUB_ENV
+        echo 'CXX=/opt/rh/devtoolset-9/root/usr/bin/g++' >> $GITHUB_ENV
+        echo 'PREFIX=/tmp/logic_synthesis-install' >> $GITHUB_ENV
+        echo "ADDITIONAL_CMAKE_OPTIONS='-DMY_CXX_WARNING_FLAGS="-W -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Werror -UNDEBUG"'" >> $GITHUB_ENV
+        echo 'RULE_MESSAGES=off' >> $GITHUB_ENV
+
+    - name: Build
+      run: |
+        make release
+        make install
+
+    - name: Unit tests
+      run: |
+        make clean
+        make test_install
+
+  macos-gcc:
+    name: macos-gcc
+    runs-on: macos-latest
+
+    steps:
+
+    - name: Cancel previous
+      uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        access_token: ${{ github.token }}
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: ssh-agent
+      uses: webfactory/ssh-agent@v0.5.4
+      with: 
+        ssh-private-key: |
+          ${{ secrets.SSH_PRIVATE_KEY_ABC }}
+          ${{ secrets.SSH_PRIVATE_KEY_LSORACLE }}
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Use ccache
+      uses: hendrikmuhs/ccache-action@v1
+      with:
+        key: macos-gcc
+
+    - name: Install dependencies
+      working-directory: ./.github/scripts
+      run: |
+        bash install_macos_dependencies_build.sh
+
+    - name: Configure shell
+      run: |
+        echo 'CC=gcc-9' >> $GITHUB_ENV
+        echo 'CXX=g++-9' >> $GITHUB_ENV
+        echo "/usr/local/opt/coreutils/libexec/gnubin" >> $GITHUB_PATH
+        echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
+        echo "$(brew --prefix)/opt/ccache/libexec" >> $GITHUB_PATH
+        echo 'PREFIX=${GITHUB_WORKSPACE}/install' >> $GITHUB_ENV
+
+    - name: Show shell configuration
+      run: |
+        env
+        which cmake && cmake --version
+        which make && make --version
+        which python && python --version
+        which $CC && $CC --version
+        which $CXX && $CXX --version
+        which bison && bison --version
+        which install && install --version
+
+    - name: Build
+      run: |
+        make release
+        make install
+
+    - name: Unit tests
+      run: |
+        make clean
+        make test_install
+
+  macos-clang:
+    name: macos-clang
+    runs-on: macos-latest
+
+    steps:
+
+    - name: Cancel previous
+      uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        access_token: ${{ github.token }}
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+        
+    - name: ssh-agent
+      uses: webfactory/ssh-agent@v0.5.4
+      with: 
+        ssh-private-key: |
+          ${{ secrets.SSH_PRIVATE_KEY_ABC }}
+          ${{ secrets.SSH_PRIVATE_KEY_LSORACLE }}
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Use ccache
+      uses: hendrikmuhs/ccache-action@v1
+      with:
+        key: macos-clang
+
+    - name: Install dependencies
+      working-directory: ./.github/scripts
+      run: |
+        bash install_macos_dependencies_build.sh
+
+    - name: Configure shell
+      run: |
+        echo 'PREFIX=${GITHUB_WORKSPACE}/install' >> $GITHUB_ENV
+        echo "/usr/local/opt/coreutils/libexec/gnubin" >> $GITHUB_PATH
+        echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
+        echo "$(brew --prefix)/opt/ccache/libexec" >> $GITHUB_PATH
+
+    - name: Show shell configuration
+      run: |
+        env
+        which cmake && cmake --version
+        which make && make --version
+        which python && python --version
+        which -a bison && bison --version
+
+    - name: Build
+      run: |
+        make release
+        make install
+
+    - name: Unit tests
+      run: |
+        make clean
+        make test_install
