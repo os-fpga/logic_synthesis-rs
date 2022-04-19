@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(de ${CMAKE_CURRENT_SOURCE_DIR}/src/de.cc)
@@ -18,4 +18,4 @@ list(APPEND DE_CXX_FLAGS_RELEASE
 )
 target_compile_options(de PUBLIC $<$<CONFIG:DEBUG>:${DE_CXX_FLAGS_DEBUG}>)
 target_compile_options(de PUBLIC $<$<CONFIG:RELEASE>:${DE_CXX_FLAGS_RELEASE}>)
-target_link_options(de PUBLIC -lpthread)
+target_link_libraries(de PRIVATE pthread)

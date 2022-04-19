@@ -18,6 +18,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
+set(ABC ${CMAKE_CURRENT_BINARY_DIR}/bin/abc)
+set(DE ${CMAKE_CURRENT_BINARY_DIR}/bin/de)
+set(LSORACLE ${CMAKE_CURRENT_BINARY_DIR}/bin/lsoracle)
+
 option(BUILD_LSORACLE "Enable build of LSOracle" OFF)
 if(BUILD_LSORACLE)
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/LSOracle-rs/lib/boost/cmake)
@@ -28,10 +32,35 @@ endif()
 add_subdirectory(abc-rs)
 add_subdirectory(de)
 
+# Add extra compilation flags to suppress warnings from some abc-rs
+# Note that target_compile_options() *appends* to the current compilation options of
+# the specified target
+
+#Since ABC is an externally developed tool, we suppress all compiler warnings
+CHECK_CXX_COMPILER_FLAG("-w" CXX_COMPILER_SUPPORTS_-w)
+if(CXX_COMPILER_SUPPORTS_-w)
+    target_compile_options(libabc PRIVATE "-w")
+    target_compile_options(abc PRIVATE "-w")
+endif()
+
+#Some ABC headers generate warnings, treat them as system headers to suppress warnings
+get_property(ABC_INCLUDE_DIRS TARGET libabc PROPERTY INCLUDE_DIRECTORIES)
+target_include_directories(libabc SYSTEM INTERFACE ${ABC_INCLUDE_DIRS})
+
 # Installation target
 install(
-    DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
-    DESTINATION logic_synthesis)
+    PROGRAMS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/abc
+             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/de
+    DESTINATION bin)
 install(
-    DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    DESTINATION logic_synthesis)
+    FILES ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/libabc.a
+    DESTINATION lib/abc)
+
+enable_testing()
+add_test(
+    NAME logic_synthesis-rs-smoke-test
+    COMMAND ${ABC} -f ../tests/abc.scr
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/abc-rs
+    )
+set_property(TEST logic_synthesis-rs-smoke-test
+    PROPERTY ENVIRONMENT ABC=${ABC} DE=${DE} LSORACLE=${LSORACLE})
