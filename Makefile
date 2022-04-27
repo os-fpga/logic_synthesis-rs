@@ -43,7 +43,7 @@ test: release
 
 ##
 ## @ dtest
-##     |---> info       :  Run tests with debug build
+##     |---> info       :  Run unit tests for debug build
 ##     |---> usage      :  make dtest
 dtest: debug
 	cmake --build dbuild --target test
