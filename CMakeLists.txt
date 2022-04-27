@@ -62,5 +62,3 @@ add_test(
     COMMAND ${ABC} -f ../tests/abc.scr
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/abc-rs
     )
-set_property(TEST logic_synthesis-rs-smoke-test
-    PROPERTY ENVIRONMENT ABC=${ABC} DE=${DE} LSORACLE=${LSORACLE})

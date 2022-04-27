@@ -42,6 +42,13 @@ test: release
 	cmake --build build --target test
 
 ##
+## @ dtest
+##     |---> info       :  Run tests with debug build
+##     |---> usage      :  make dtest
+dtest: debug
+	cmake --build dbuild --target test
+
+##
 ## @ clean
 ##     |---> info       :  Clean all
 ##     |---> usage      :  make clean
