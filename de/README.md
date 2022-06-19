@@ -20,13 +20,14 @@ where:
 # The “&de” ABC command
 DE is called from ABC through a new ABC9 command of name ‘&de’. This command will take the following arguments:
 ```bash
-&de -i <input_eqn_file> -o <output_eqn_file> -t <target> -d <depth> -g -v
+&de -i <input_eqn_file> -o <output_eqn_file> -t <target> -d <depth> -n <max_thread_number> -g -v
 ```
 where
 - `-i <input_eqn_file>` : name of the EQN file describing the input Boolean equations to optimize and map.
 - `-o <output_eqn_file>` : name of the EQN file describing the optimized and mapped Boolean network (mapping up to K inputs, e.g. 6 here)
 - `-t <target>` : either “area” or “delay” or “mixed”, targeting either an area solution minimizing #Luts, or a delay solution minimizing the max Lut path level or a mixed solution being a good trade off between area and delay (product of #Luts and Max Lut Path level).
 - `-d <depth>` : an integer value between -1 and +infinity. It represents the max exploration depth so it should corresponds to a reasonable value not exceeding 10, 50, 100 depending on the size of the design. Generally can be 100 for a small designs (~500 Luts), 3 for a very big one (> 20K Luts), 11 to 21 in general. There is an automatic mode with value -1 that will dynamically along the exploration process set the best value. Therefore it is recommended to set depth to -1.
+- `-n` : controls the number of threads
 - `-g` : if invoked then a DOT graph will pop up to show the exploration process with all the statistics, pruning, max limited, failures. This is only for analysis. We do not use it in normal mode.
 - `-v` : if invoked then trace all informations related to the threads exploration. Generally most used for analysis. We do not use it in normal mode.
 
