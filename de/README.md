@@ -20,7 +20,7 @@ where:
 # The “&de” ABC command
 DE is called from ABC through a new ABC9 command of name ‘&de’. This command will take the following arguments:
 ```bash
-&de -i <input_eqn_file> -o <output_eqn_file> -t <target> -d <depth> -n <max_thread_number> -g -v
+&de -i <input_eqn_file> -o <output_eqn_file> -t <target> -d <depth> -n <max_threads> -g -v
 ```
 where
 - `-i <input_eqn_file>` : name of the EQN file describing the input Boolean equations to optimize and map.
