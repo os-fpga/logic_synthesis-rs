@@ -9,7 +9,7 @@ if (PRODUCTION_BUILD)
     get_filename_component(FLEX_LM_SRC_DIR "../../../Tools/Flex_LM"
         REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
-    if (NOT RAPTOR)
+    if ((NOT RAPTOR) AND (NOT YOSYS_VERIFIC))
         add_subdirectory(${FLEX_LM_SRC_DIR} Flex_LM)
     endif()
     set(CXX_DEFINES "-DPRODUCTION_BUILD=1")
