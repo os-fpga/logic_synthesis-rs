@@ -6,12 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(de ${CMAKE_CURRENT_SOURCE_DIR}/src/de.cc)
 
 if (PRODUCTION_BUILD)
-    if (NOT FLEX_LM_SRC_DIR)
-        message(FATAL_ERROR "Flex_LM source dir is not set.")
-    endif()
-
     if ((NOT RAPTOR) AND (NOT YOSYS_VERIFIC))
+        # FLEX_LM_SRC_DIR should be made as required path.
+        get_filename_component(FLEX_LM_SRC_DIR "../../../Tools/Flex_LM"
+          REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
         add_subdirectory(${FLEX_LM_SRC_DIR} Flex_LM)
+    # No need for else case.
     endif()
     set(CXX_DEFINES "-DPRODUCTION_BUILD=1")
 endif()
