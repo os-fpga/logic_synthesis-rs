@@ -20,15 +20,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 set(ABC ${CMAKE_CURRENT_BINARY_DIR}/bin/abc)
 set(DE ${CMAKE_CURRENT_BINARY_DIR}/bin/de)
-set(LSORACLE ${CMAKE_CURRENT_BINARY_DIR}/bin/lsoracle)
 
-option(BUILD_LSORACLE "Enable build of LSOracle" OFF)
-if(BUILD_LSORACLE)
-    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/LSOracle-rs/lib/boost/cmake)
-    add_subdirectory(LSOracle-rs/lib/boost)
-    option(LOCAL_BOOST "use boost from submodules" OFF)
-    add_subdirectory(LSOracle-rs)
-endif()
 add_subdirectory(abc-rs)
 add_subdirectory(de)
 
