@@ -14,6 +14,39 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 project(logic_synthesis)
 
+list(APPEND LOGIC_SYNTHESIS_RS_RECURSIVE_SUBSYTEMS
+    abc-rs
+    )
+
+find_package(Git QUIET)
+
+function(checkout_subsystems SUBSYSTEM_LIST WORK_DIR RECURSIVE)
+    foreach(SUBMODULE IN LISTS ${SUBSYSTEM_LIST})
+        file(GLOB README ${WORK_DIR}/${SUBMODULE}/README*)
+        if (NOT EXISTS "${README}")
+            execute_process(
+                COMMAND ${GIT_EXECUTABLE} submodule update --init ${RECURSIVE} ${SUBMODULE}
+                WORKING_DIRECTORY ${WORK_DIR}
+                RESULT_VARIABLE GIT_SUBMOD_RESULT
+                )
+            if  (NOT GIT_SUBMOD_RESULT EQUAL "0") 
+                message(FATAL_ERROR "\"${GIT_EXECUTABLE} submodule update --init ${RECURSIVE} ${SUBMODULE}\" failed with ${GIT_SUBMOD_RESULT}, please checkout submodule manually")
+            endif()
+        endif()
+    endforeach()
+endfunction(checkout_subsystems)
+
+if (PRODUCTION_BUILD)
+    if ((NOT RAPTOR) AND (NOT YOSYS_VERIFIC))
+        list(APPEND LOGIC_SYNTHESIS_RS_NON_RECURSIVE_SUBSYTEMS
+            Raptor_Tools
+            )
+    endif()
+endif()
+
+checkout_subsystems(LOGIC_SYNTHESIS_RS_RECURSIVE_SUBSYTEMS ${CMAKE_CURRENT_SOURCE_DIR} "--recursive")
+checkout_subsystems(LOGIC_SYNTHESIS_RS_NON_RECURSIVE_SUBSYTEMS ${CMAKE_CURRENT_SOURCE_DIR} "")
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
