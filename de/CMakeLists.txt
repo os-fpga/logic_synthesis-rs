@@ -8,7 +8,7 @@ add_executable(de ${CMAKE_CURRENT_SOURCE_DIR}/src/de.cc)
 if (PRODUCTION_BUILD)
     if ((NOT RAPTOR) AND (NOT YOSYS_VERIFIC))
         # FLEX_LM_SRC_DIR should be made as required path.
-        get_filename_component(FLEX_LM_SRC_DIR "../../../Tools/Flex_LM"
+        get_filename_component(FLEX_LM_SRC_DIR "../Raptor_Tools/Flex_LM"
           REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
         add_subdirectory(${FLEX_LM_SRC_DIR} Flex_LM)
     # No need for else case.
