@@ -38,13 +38,11 @@ jobs:
       with: 
         ssh-private-key: |
           ${{ secrets.SSH_PRIVATE_KEY_ABC }}
-          ${{ secrets.SSH_PRIVATE_KEY_VERIFIC }}
           ${{ secrets.SSH_PRIVATE_KEY_RAPTOR_TOOLS }}
 
     - name: Checkout code
       uses: actions/checkout@v2
       with:
-        submodules: recursive
         fetch-depth: 0
 
     - name: Install dependencies
@@ -132,12 +130,11 @@ jobs:
       with: 
         ssh-private-key: |
           ${{ secrets.SSH_PRIVATE_KEY_ABC }}
-          ${{ secrets.SSH_PRIVATE_KEY_LSORACLE }}
+          ${{ secrets.SSH_PRIVATE_KEY_RAPTOR_TOOLS }}
 
     - name: Checkout code
       uses: actions/checkout@v2
       with:
-        submodules: recursive
         fetch-depth: 0
         
     - name: Install dependencies
@@ -191,11 +188,10 @@ jobs:
       with: 
         ssh-private-key: |
           ${{ secrets.SSH_PRIVATE_KEY_ABC }}
-          ${{ secrets.SSH_PRIVATE_KEY_LSORACLE }}
+          ${{ secrets.SSH_PRIVATE_KEY_RAPTOR_TOOLS }}
 
     - uses: actions/checkout@v2
       with:
-        submodules: recursive
         fetch-depth: 0
 
     - name: Use ccache
@@ -258,11 +254,10 @@ jobs:
       with: 
         ssh-private-key: |
           ${{ secrets.SSH_PRIVATE_KEY_ABC }}
-          ${{ secrets.SSH_PRIVATE_KEY_LSORACLE }}
+          ${{ secrets.SSH_PRIVATE_KEY_RAPTOR_TOOLS }}
 
     - uses: actions/checkout@v2
       with:
-        submodules: recursive
         fetch-depth: 0
 
     - name: Use ccache
