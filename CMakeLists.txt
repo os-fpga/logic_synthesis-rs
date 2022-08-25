@@ -42,7 +42,7 @@ function(checkout_subsystems SUBSYSTEM_LIST WORK_DIR RECURSIVE UPDATE)
 endfunction(checkout_subsystems)
 
 if (NOT UPDATE_SUBMODULES)
-    set(UPDATE_SUBMODULES NO)
+    set(UPDATE_SUBMODULES OFF)
 endif()
 
 checkout_subsystems(LOGIC_SYNTHESIS_RS_RECURSIVE_SUBSYTEMS ${CMAKE_CURRENT_SOURCE_DIR} "--recursive" ${UPDATE_SUBMODULES})
