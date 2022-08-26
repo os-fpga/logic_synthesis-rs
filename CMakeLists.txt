@@ -14,21 +14,52 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 project(logic_synthesis)
 
+list(APPEND LOGIC_SYNTHESIS_RS_RECURSIVE_SUBSYTEMS
+    abc-rs
+    )
+
+list(APPEND LOGIC_SYNTHESIS_RS_NON_RECURSIVE_SUBSYTEMS
+    Raptor_Tools
+    )
+
+find_package(Git QUIET)
+
+function(checkout_subsystems SUBSYSTEM_LIST WORK_DIR RECURSIVE UPDATE)
+    foreach(SUBMODULE IN LISTS ${SUBSYSTEM_LIST})
+        file(GLOB README ${WORK_DIR}/${SUBMODULE}/README*)
+        if (NOT EXISTS "${README}" OR ${UPDATE})
+            message("Updating ${SUBMODULE} submodule...")
+            execute_process(
+                COMMAND ${GIT_EXECUTABLE} submodule update --init ${RECURSIVE} ${SUBMODULE}
+                WORKING_DIRECTORY ${WORK_DIR}
+                RESULT_VARIABLE GIT_SUBMOD_RESULT
+                )
+            if  (NOT GIT_SUBMOD_RESULT EQUAL "0") 
+                message(FATAL_ERROR "\"${GIT_EXECUTABLE} submodule update --init ${RECURSIVE} ${SUBMODULE}\" failed with ${GIT_SUBMOD_RESULT}, please checkout submodule manually")
+            endif()
+        endif()
+    endforeach()
+endfunction(checkout_subsystems)
+
+if (NOT UPDATE_SUBMODULES)
+    set(UPDATE_SUBMODULES OFF)
+endif()
+
+checkout_subsystems(LOGIC_SYNTHESIS_RS_RECURSIVE_SUBSYTEMS ${CMAKE_CURRENT_SOURCE_DIR} "--recursive" ${UPDATE_SUBMODULES})
+
+if (PRODUCTION_BUILD)
+    if ((NOT RAPTOR) AND (NOT YOSYS_VERIFIC))
+        checkout_subsystems(LOGIC_SYNTHESIS_RS_NON_RECURSIVE_SUBSYTEMS ${CMAKE_CURRENT_SOURCE_DIR} "" ${UPDATE_SUBMODULES})
+    endif()
+endif()
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 set(ABC ${CMAKE_CURRENT_BINARY_DIR}/bin/abc)
 set(DE ${CMAKE_CURRENT_BINARY_DIR}/bin/de)
-set(LSORACLE ${CMAKE_CURRENT_BINARY_DIR}/bin/lsoracle)
 
-option(BUILD_LSORACLE "Enable build of LSOracle" OFF)
-if(BUILD_LSORACLE)
-    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/LSOracle-rs/lib/boost/cmake)
-    add_subdirectory(LSOracle-rs/lib/boost)
-    option(LOCAL_BOOST "use boost from submodules" OFF)
-    add_subdirectory(LSOracle-rs)
-endif()
 add_subdirectory(abc-rs)
 add_subdirectory(de)
 
