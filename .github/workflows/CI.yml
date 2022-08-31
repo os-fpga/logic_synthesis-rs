@@ -55,6 +55,11 @@ jobs:
       with:
         key: linux-${{ matrix.mode }}
 
+    - name: Configure git
+      if: matrix.mode == 'test'
+      run: |
+        git config --global --add safe.directory $GITHUB_WORKSPACE
+
     - name: Configure shell
       run: |
         echo 'CC=gcc-9' >> $GITHUB_ENV
