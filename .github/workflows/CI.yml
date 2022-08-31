@@ -143,7 +143,6 @@ jobs:
         bash install_centos_dependencies_build.sh
 
     - name: Configure git
-      if: matrix.mode == 'test'
       run: |
         git config --global --add safe.directory $GITHUB_WORKSPACE
 
