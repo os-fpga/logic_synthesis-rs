@@ -61,7 +61,20 @@ set(ABC ${CMAKE_CURRENT_BINARY_DIR}/bin/abc)
 set(DE ${CMAKE_CURRENT_BINARY_DIR}/bin/de)
 
 add_subdirectory(abc-rs)
-add_subdirectory(de)
+if(USE_DE_SRC)
+    add_subdirectory(de)
+else()
+    if(PRODUCTION_BUILD)
+        set(DE_EXE ${CMAKE_CURRENT_SOURCE_DIR}/de/src/production/de)
+    else()
+        set(DE_EXE ${CMAKE_CURRENT_SOURCE_DIR}/de/src/eng/de)
+    endif()
+    add_custom_target(de ALL
+    COMMENT      "      Building DE      "
+    DEPENDS ${DE_EXE}
+    COMMAND ${CMAKE_COMMAND} -E copy ${DE_EXE} ${CMAKE_CURRENT_BINARY_DIR}/bin
+)
+endif()
 
 # Add extra compilation flags to suppress warnings from some abc-rs
 # Note that target_compile_options() *appends* to the current compilation options of
