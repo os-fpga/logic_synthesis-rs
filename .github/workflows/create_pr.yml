@@ -1,0 +1,69 @@
+name: 'Create PR for exe branch push'
+
+on:
+  #push:
+  repository_dispatch:
+    types: [new_exe_added]
+
+jobs:
+  create_PR:
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: ssh-agent
+      uses: webfactory/ssh-agent@v0.5.4
+      with: 
+        ssh-private-key: |
+          ${{ secrets.SSH_PRIVATE_KEY_ABC }}
+          ${{ secrets.SSH_PRIVATE_KEY_RAPTOR_TOOLS }}
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      working-directory: ./.github/scripts
+      run: |
+        bash install_ubuntu_dependencies_build.sh
+
+    - name: Configure shell
+      run: |
+        echo 'CC=gcc-11' >> $GITHUB_ENV
+        echo 'CXX=g++-11' >> $GITHUB_ENV
+        echo 'PATH=/usr/lib/ccache:'"$PATH" >> $GITHUB_ENV
+        echo 'PREFIX=/tmp/logic_synthesis-install' >> $GITHUB_ENV
+        echo "ADDITIONAL_CMAKE_OPTIONS='-DMY_CXX_WARNING_FLAGS="-W -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Werror -UNDEBUG"'" >> $GITHUB_ENV
+        echo 'RULE_MESSAGES=off' >> $GITHUB_ENV
+
+    - name: Show shell configuration
+      run: |
+        env
+        which cmake && cmake --version
+        which make && make --version
+        which python && python --version
+        which ninja && ninja --version
+        which $CC && $CC --version
+        which $CXX && $CXX --version
+
+    - name: Test
+      run: |
+        make release
+        make test
+
+    - name: Create PR
+      uses: repo-sync/pull-request@v2
+      with:
+          source_branch: xml_${{ github.event.client_payload.branch_name }}                                # branch having xmls files
+          destination_branch: "main"                                                                   # name of branch on which PR go
+          pr_title: "Pushing new de exe from ${{ github.event.client_payload.branch_name }} into main. "               # Title of pull request
+          pr_body: "An automated PR to checkin New de exe. Click on link to see test results ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"                              # Full markdown support, requires pr_title
+          pr_reviewer: "alain-rs"                                                         # Comma-separated list (no spaces)
+          pr_assignee: "nadeemyaseen-rs,thierryBesson"                                                  # Comma-separated list (no spaces)
+          pr_label: "new_de_exe"                                             # Comma-separated list (no spaces)
+          pr_allow_empty: true                                                            # Creates pull request even if there are no changes
+          github_token: ${{ secrets.GITHUB_TOKEN }}
