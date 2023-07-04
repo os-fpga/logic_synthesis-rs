@@ -52,13 +52,15 @@ jobs:
 
     - name: Test
       run: |
+        git config --global --add safe.directory $GITHUB_WORKSPACE
+        git checkout origin/${{ github.event.client_payload.branch_name }}
         make release
         make test
 
     - name: Create PR
       uses: repo-sync/pull-request@v2
       with:
-          source_branch: xml_${{ github.event.client_payload.branch_name }}                                # branch having xmls files
+          source_branch: ${{ github.event.client_payload.branch_name }}                                # branch having new de exe
           destination_branch: "main"                                                                   # name of branch on which PR go
           pr_title: "Pushing new de exe from ${{ github.event.client_payload.branch_name }} into main. "               # Title of pull request
           pr_body: "An automated PR to checkin New de exe. Click on link to see test results ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"                              # Full markdown support, requires pr_title
