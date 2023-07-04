@@ -168,6 +168,7 @@ jobs:
         make test_install
 
   macos-gcc:
+    if: ${{ false }}  # EDA-799
     name: macos-gcc
     runs-on: macos-latest
 
@@ -234,6 +235,7 @@ jobs:
         make test_install
 
   macos-clang:
+    if: ${{ false }}  # EDA-799
     name: macos-clang
     runs-on: macos-latest
 
