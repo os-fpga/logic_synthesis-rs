@@ -53,6 +53,7 @@ jobs:
     - name: Test
       run: |
         git config --global --add safe.directory $GITHUB_WORKSPACE
+        git fetch --prune --unshallow
         git checkout origin/${{ github.event.client_payload.branch_name }}
         make release
         make test
