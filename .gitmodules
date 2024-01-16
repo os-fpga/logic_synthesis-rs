@@ -1,6 +1,6 @@
 [submodule "abc-rs"]
 	path = abc-rs
-	url = git@github.com:RapidSilicon/abc-rs.git
+	url = https://github.com/os-fpga/abc-rs.git
 [submodule "Raptor_Tools"]
 	path = Raptor_Tools
-	url = git@github.com:RapidSilicon/Raptor_Tools.git
+	url = https://github.com/os-fpga/Raptor_Tools.git
