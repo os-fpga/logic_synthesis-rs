@@ -61,20 +61,27 @@ set(ABC ${CMAKE_CURRENT_BINARY_DIR}/bin/abc)
 set(DE ${CMAKE_CURRENT_BINARY_DIR}/bin/de)
 
 add_subdirectory(abc-rs)
-if(USE_DE_SRC)
+if(USE_DE_SRC AND NOT RAPTOR)
     add_subdirectory(de)
 else()
+    execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin)
     if(PRODUCTION_BUILD)
        # set(DE_EXE ${CMAKE_CURRENT_SOURCE_DIR}/de/src/production/de)
 	set(DE_EXE ${CMAKE_CURRENT_SOURCE_DIR}/de/src/eng/de) # workaround to by pass flexlm EDA-2365
     else()
         set(DE_EXE ${CMAKE_CURRENT_SOURCE_DIR}/de/src/eng/de)
     endif()
-    add_custom_target(de ALL
+    add_custom_target(de
     COMMENT      "      Building DE      "
     DEPENDS ${DE_EXE}
-    COMMAND ${CMAKE_COMMAND} -E copy ${DE_EXE} ${CMAKE_CURRENT_BINARY_DIR}/bin
+    COMMAND ${CMAKE_COMMAND} -E copy ${DE_EXE} ${CMAKE_BINARY_DIR}/bin
 )
+	add_custom_target(de_copy ALL
+    COMMENT      "      Copy DE      "
+)
+	if(NOT RAPTOR)
+		add_dependencies(de_copy de)
+	endif()
 endif()
 
 # Add extra compilation flags to suppress warnings from some abc-rs
@@ -95,7 +102,7 @@ target_include_directories(libabc SYSTEM INTERFACE ${ABC_INCLUDE_DIRS})
 # Installation target
 install(
     PROGRAMS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/abc
-             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/de
+             ${CMAKE_BINARY_DIR}/bin/de
     DESTINATION bin)
 install(
     FILES ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/libabc.a
