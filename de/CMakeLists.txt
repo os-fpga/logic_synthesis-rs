@@ -36,3 +36,13 @@ if (PRODUCTION_BUILD)
      target_include_directories(de PUBLIC ${OPENLM_DIR}  ${OPENLM_DIR}/licensecc/install/include ${OPENLM_DIR}/licensecc/install/include/licensecc/Raptor)
      target_link_libraries(de PUBLIC rs_licenseManager)
 endif()
+
+add_custom_command(TARGET de POST_BUILD
+      COMMAND echo "Copying de in bin dir"
+      COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/de
+        ${CMAKE_BINARY_DIR}/bin/
+)
+
+
+
