@@ -20,36 +20,50 @@ list(APPEND LOGIC_SYNTHESIS_RS_RECURSIVE_SUBSYTEMS
 
 list(APPEND LOGIC_SYNTHESIS_RS_NON_RECURSIVE_SUBSYTEMS
     Raptor_Tools
+    Raptor_Tools/OpenLM
     )
 
 find_package(Git QUIET)
 
-function(checkout_subsystems SUBSYSTEM_LIST WORK_DIR RECURSIVE UPDATE)
-    foreach(SUBMODULE IN LISTS ${SUBSYSTEM_LIST})
-        file(GLOB README ${WORK_DIR}/${SUBMODULE}/README*)
-        if (NOT EXISTS "${README}" OR ${UPDATE})
-            message("Updating ${SUBMODULE} submodule...")
-            execute_process(
-                COMMAND ${GIT_EXECUTABLE} submodule update --init ${RECURSIVE} ${SUBMODULE}
-                WORKING_DIRECTORY ${WORK_DIR}
-                RESULT_VARIABLE GIT_SUBMOD_RESULT
-                )
-            if  (NOT GIT_SUBMOD_RESULT EQUAL "0") 
-                message(FATAL_ERROR "\"${GIT_EXECUTABLE} submodule update --init ${RECURSIVE} ${SUBMODULE}\" failed with ${GIT_SUBMOD_RESULT}, please checkout submodule manually")
-            endif()
-        endif()
-    endforeach()
+function(checkout_subsystems SUBSYSTEM_LIST WORK_DIR RECURSIVE UPDATE PARTIAL)
+    set(ORGNL_RECEV ${WORK_DIR})
+    message("###########################")
+    message(${SUBSYSTEM_LIST})
+    message("###########################")
+  foreach(GIVEN_SUBMODULE IN LISTS ${SUBSYSTEM_LIST})
+    if(PARTIAL)
+        set(WORK_DIR ${ORGNL_RECEV})
+        get_filename_component(SUBMODULE "${GIVEN_SUBMODULE}" NAME)
+        get_filename_component(extract_dir "${GIVEN_SUBMODULE}" DIRECTORY)
+        set(WORK_DIR ${WORK_DIR}/${extract_dir})
+    else()
+        set(SUBMODULE ${GIVEN_SUBMODULE})    
+    endif()
+    file(GLOB README ${WORK_DIR}/${SUBMODULE}/README*)
+    if (NOT EXISTS "${README}" OR ${UPDATE})
+      message("Updating ${SUBMODULE} submodule...")
+      execute_process(
+        COMMAND ${GIT_EXECUTABLE} submodule update --init ${RECURSIVE} ${SUBMODULE}
+        WORKING_DIRECTORY ${WORK_DIR}
+        RESULT_VARIABLE GIT_SUBMOD_RESULT
+        )
+      if  (NOT GIT_SUBMOD_RESULT EQUAL "0")
+        message(FATAL_ERROR "\"${GIT_EXECUTABLE} submodule update --init ${RECURSIVE} ${SUBMODULE}\" failed with ${GIT_SUBMOD_RESULT}, please checkout submodule manually")
+      endif()
+    endif()
+  endforeach()
 endfunction(checkout_subsystems)
 
 if (NOT UPDATE_SUBMODULES)
     set(UPDATE_SUBMODULES OFF)
 endif()
 
-checkout_subsystems(LOGIC_SYNTHESIS_RS_RECURSIVE_SUBSYTEMS ${CMAKE_CURRENT_SOURCE_DIR} "--recursive" ${UPDATE_SUBMODULES})
+checkout_subsystems(LOGIC_SYNTHESIS_RS_RECURSIVE_SUBSYTEMS ${CMAKE_CURRENT_SOURCE_DIR} "--recursive" ${UPDATE_SUBMODULES} OFF)
 
 if (PRODUCTION_BUILD)
     if ((NOT RAPTOR) AND (NOT YOSYS_VERIFIC))
-        # checkout_subsystems(LOGIC_SYNTHESIS_RS_NON_RECURSIVE_SUBSYTEMS ${CMAKE_CURRENT_SOURCE_DIR} "" ${UPDATE_SUBMODULES})
+        checkout_subsystems(LOGIC_SYNTHESIS_RS_NON_RECURSIVE_SUBSYTEMS ${CMAKE_CURRENT_SOURCE_DIR} "" ${UPDATE_SUBMODULES} OFF)
+        checkout_subsystems(LOGIC_SYNTHESIS_RS_NON_RECURSIVE_SUBSYTEMS ${CMAKE_CURRENT_SOURCE_DIR} "" ${UPDATE_SUBMODULES} ON)
     endif()
 endif()
 
