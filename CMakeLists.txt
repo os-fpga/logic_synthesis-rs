@@ -80,7 +80,7 @@ set(ABC ${CMAKE_CURRENT_BINARY_DIR}/bin/abc)
 set(DE ${CMAKE_CURRENT_BINARY_DIR}/bin/de)
 
 add_subdirectory(abc-rs)
-if(USE_DE_SRC AND NOT RAPTOR)
+if(USE_DE_SRC)
     add_subdirectory(de)
 else()
     execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin)
